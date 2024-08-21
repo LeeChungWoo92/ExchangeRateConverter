@@ -1,6 +1,14 @@
+import 'package:exchange_rate_converter/data/data_source/exchange_rate_api_data_source.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'dart:io';
 
-void main() {
+void main() async {
+  await dotenv.load(fileName: '.env');
+
+  final dataSource =
+      ExchangeRateApiDataSource(baseUrl: 'https://v6.exchangerate-api.com');
+  print(await dataSource.getExchangeRates('USD'));
   runApp(const MyApp());
 }
 
