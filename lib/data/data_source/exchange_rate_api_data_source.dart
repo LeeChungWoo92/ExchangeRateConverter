@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:exchange_rate_converter/data/data_source/exchange_rate_data_source.dart';
 import 'package:exchange_rate_converter/data/dto/exchange_rate_dto/exchange_rate_dto.dart';
 import 'package:exchange_rate_converter/data/mapper/exchange_rate_dto_mapper.dart';
@@ -6,8 +8,8 @@ import 'package:exchange_rate_converter/domain/model/exchnage_rate.dart';
 import 'package:http/http.dart' as http;
 
 class ExchangeRateApiDataSource implements ExchangeRateDataSource {
+  final String apiKey = dotenv.env['API_KEY']!;
   final String baseUrl;
-  final String apiKey = '8e3e00b37a21a7314ea44d27';
 
   ExchangeRateApiDataSource({
     required this.baseUrl,
