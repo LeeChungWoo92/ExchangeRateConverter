@@ -1,57 +1,45 @@
-import 'package:exchange_rate_converter/domain/repository/exchange_rate_repository.dart';
+import 'package:exchange_rate_converter/domain/model/exchnage_rate.dart';
 import 'package:flutter/material.dart';
+import 'package:exchange_rate_converter/domain/repository/exchange_rate_repository.dart';
 
 class HomeScreenViewModel with ChangeNotifier {
+  final ExchangeRateRepository _exchangeRateRepository;
+  ExchangeRate? _exchangeRate;
+  String _baseCode = 'KRW';
+  double _amount = 1.0;
+
   HomeScreenViewModel({
-    required ExchangeRateRepository exchangeRepository,
-  }) : _exchangeRepository = exchangeRepository {
-    fetchExchangeRates('USD');
+    required ExchangeRateRepository exchangeRateRepository,
+  }) : _exchangeRateRepository = exchangeRateRepository {
+    onSearch(_baseCode);
   }
 
-  final ExchangeRateRepository _exchangeRepository;
-  
-  final TextEditingController amountController = TextEditingController();
-  String baseCode = 'KRW'; 
-  String targetCode = 'USD'; 
-  double? conversionRate;
-  String? lastUpdated;
-  String result = '';
+  ExchangeRate? get exchangeRate => _exchangeRate;
+  String get baseCode => _baseCode;
+  double get amount => _amount;
 
-  Future<void> fetchExchangeRates(String base) async {
+  List<String> get currencyList => 
+      _exchangeRate?.conversionRates?.keys.toList() ?? [];
+
+  Future<void> onSearch(String baseCode) async {
+    _baseCode = baseCode;
     try {
-      final rates = await _exchangeRepository.getExchangeRates(base);
-      conversionRate = rates.conversionRates[targetCode];
-      lastUpdated = rates.timeLastUpdateUtc;
+      _exchangeRate = await _exchangeRateRepository.getExchangeRates(baseCode);
       notifyListeners();
     } catch (e) {
-      print('Error fetching exchange rates: $e');
+    }
+  }
+
+  void setAmount(String newAmount) {
+    _amount = double.tryParse(newAmount) ?? 0.0;
+    notifyListeners();
+  }
+
+  double getConvertedAmount(String targetCurrency) {
+    final conversionRates = _exchangeRate?.conversionRates;
+    if (conversionRates == null) return 0.0;
     
-    }
-  }
-
-  void onAmountChanged() {
-    if (amountController.text.isNotEmpty && conversionRate != null) {
-      final amount = double.tryParse(amountController.text) ?? 0;
-      final convertedAmount = amount * (1 / conversionRate!);
-      result = '${amount.toStringAsFixed(2)} $baseCode = ${convertedAmount.toStringAsFixed(2)} $targetCode';
-    } else {
-      result = '';
-    }
-    notifyListeners();
-  }
-
-  void swapCurrencies() {
-    final temp = baseCode;
-    baseCode = targetCode;
-    targetCode = temp;
-    fetchExchangeRates(baseCode);
-    onAmountChanged(); 
-    notifyListeners();
-  }
-
-  @override
-  void dispose() {
-    amountController.dispose();
-    super.dispose();
+    final rate = conversionRates[targetCurrency];
+    return rate != null ? _amount * rate : 0.0;
   }
 }

@@ -6,7 +6,7 @@ import 'package:exchange_rate_converter/domain/repository/exchange_rate_reposito
 class ExchangeRateRepositoryImpl implements ExchangeRateRepository {
   final ExchangeRateDataSource exchangeRateDataSource;
   ExchangeRateRepositoryImpl({
-    required this.exchangeRateDataSource,
+    required this.exchangeRateDataSource, 
   });
 
   @override
