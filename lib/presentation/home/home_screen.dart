@@ -23,7 +23,6 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildCurrencyRow(BuildContext context, HomeScreenViewModel viewModel, bool isBase) {
     return Container(
       padding: const EdgeInsets.all(8),
